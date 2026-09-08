@@ -1,5 +1,4 @@
 import { neon } from "@neondatabase/serverless";
-import type { NeonQueryFunction } from "@neondatabase/serverless";
 
 export interface Novel {
   id: number;
@@ -12,7 +11,8 @@ export interface Novel {
   status: string;
 }
 
-let _sql: NeonQueryFunction<false> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _sql: any = null;
 
 function getSQL() {
   if (!_sql) {
