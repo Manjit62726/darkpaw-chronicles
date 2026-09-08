@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { createHash } from "crypto";
 
 export interface Novel {
   id: number;
@@ -60,7 +61,7 @@ async function initDB() {
   if (check.length === 0) {
     // Delete any old registration accounts, then create default admin
     await sql`DELETE FROM admins`;
-    const hash = await hashPassword("admin123");
+    const hash = hashPassword("admin123");
     await sql`
       INSERT INTO admins (username, password_hash)
       VALUES ('admin', ${hash})
@@ -70,18 +71,14 @@ async function initDB() {
   _initialized = true;
 }
 
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + "darkpaw_salt_2024");
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+function hashPassword(password: string): string {
+  return createHash("sha256").update(password + "darkpaw_salt_2024").digest("hex");
 }
 
 export async function verifyAdmin(username: string, password: string) {
   await initDB();
   const sql = getSQL();
-  const hash = await hashPassword(password);
+  const hash = hashPassword(password);
   const rows = await sql`
     SELECT id, username FROM admins
     WHERE username = ${username} AND password_hash = ${hash}
@@ -92,7 +89,7 @@ export async function verifyAdmin(username: string, password: string) {
 export async function changeAdminPassword(userId: number, newPassword: string) {
   await initDB();
   const sql = getSQL();
-  const hash = await hashPassword(newPassword);
+  const hash = hashPassword(newPassword);
   await sql`
     UPDATE admins SET password_hash = ${hash} WHERE id = ${userId}
   `;
