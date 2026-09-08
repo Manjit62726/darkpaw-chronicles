@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import type { NeonQueryFunction } from "@neondatabase/serverless";
 
 export interface Novel {
   id: number;
@@ -11,9 +12,20 @@ export interface Novel {
   status: string;
 }
 
-const sql = neon(process.env.DATABASE_URL!);
+let _sql: NeonQueryFunction<false> | null = null;
 
-export async function initDB() {
+function getSQL() {
+  if (!_sql) {
+    _sql = neon(process.env.DATABASE_URL!);
+  }
+  return _sql;
+}
+
+let _initialized = false;
+
+async function initDB() {
+  if (_initialized) return;
+  const sql = getSQL();
   await sql`
     CREATE TABLE IF NOT EXISTS novels (
       id SERIAL PRIMARY KEY,
@@ -27,10 +39,12 @@ export async function initDB() {
       created_at TIMESTAMP DEFAULT NOW()
     );
   `;
+  _initialized = true;
 }
 
 export async function getNovels(): Promise<Novel[]> {
   await initDB();
+  const sql = getSQL();
   const rows = await sql`SELECT * FROM novels ORDER BY created_at DESC`;
   return rows as Novel[];
 }
@@ -45,6 +59,7 @@ export async function addNovel(
   status: string
 ) {
   await initDB();
+  const sql = getSQL();
   const rows = await sql`
     INSERT INTO novels (title, novel_name, youtube_url, thumbnail_url, total_chapters, uploaded_chapters, status)
     VALUES (${title}, ${novelName}, ${youtubeUrl}, ${thumbnailUrl}, ${totalChapters}, ${uploadedChapters}, ${status})
@@ -64,6 +79,7 @@ export async function updateNovel(
   status: string
 ) {
   await initDB();
+  const sql = getSQL();
   const rows = await sql`
     UPDATE novels
     SET title = ${title}, novel_name = ${novelName}, youtube_url = ${youtubeUrl},
@@ -77,5 +93,6 @@ export async function updateNovel(
 
 export async function deleteNovel(id: number) {
   await initDB();
+  const sql = getSQL();
   await sql`DELETE FROM novels WHERE id = ${id}`;
 }
