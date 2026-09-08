@@ -6,6 +6,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = request.cookies.get("admin_session");
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { title, novelName, youtubeUrl, thumbnailUrl, totalChapters, uploadedChapters, status } = body;
@@ -20,7 +25,7 @@ export async function PUT(
       status
     );
     return NextResponse.json(novel);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to update novel" }, { status: 500 });
   }
 }
@@ -30,10 +35,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = request.cookies.get("admin_session");
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     await deleteNovel(parseInt(id));
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete novel" }, { status: 500 });
   }
 }

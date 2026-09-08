@@ -9,6 +9,13 @@ export interface Novel {
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
+  created_at: string;
+}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  password_hash: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,6 +34,14 @@ async function initDB() {
   if (_initialized) return;
   const sql = getSQL();
   await sql`
+    CREATE TABLE IF NOT EXISTS admins (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(100) UNIQUE NOT NULL,
+      password_hash VARCHAR(500) NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+  `;
+  await sql`
     CREATE TABLE IF NOT EXISTS novels (
       id SERIAL PRIMARY KEY,
       title VARCHAR(500) NOT NULL,
@@ -42,11 +57,51 @@ async function initDB() {
   _initialized = true;
 }
 
+// Simple hash using Web Crypto API (works in Edge runtime)
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + "darkpaw_salt_2024");
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export async function createAdmin(username: string, password: string) {
+  await initDB();
+  const sql = getSQL();
+  const hash = await hashPassword(password);
+  const rows = await sql`
+    INSERT INTO admins (username, password_hash)
+    VALUES (${username}, ${hash})
+    ON CONFLICT (username) DO UPDATE SET password_hash = ${hash}
+    RETURNING id, username
+  `;
+  return rows[0];
+}
+
+export async function verifyAdmin(username: string, password: string) {
+  await initDB();
+  const sql = getSQL();
+  const hash = await hashPassword(password);
+  const rows = await sql`
+    SELECT id, username FROM admins
+    WHERE username = ${username} AND password_hash = ${hash}
+  `;
+  return rows[0] || null;
+}
+
 export async function getNovels(): Promise<Novel[]> {
   await initDB();
   const sql = getSQL();
   const rows = await sql`SELECT * FROM novels ORDER BY created_at DESC`;
   return rows as Novel[];
+}
+
+export async function getNovel(id: number): Promise<Novel | null> {
+  await initDB();
+  const sql = getSQL();
+  const rows = await sql`SELECT * FROM novels WHERE id = ${id}`;
+  return (rows[0] as Novel) || null;
 }
 
 export async function addNovel(
@@ -95,4 +150,17 @@ export async function deleteNovel(id: number) {
   await initDB();
   const sql = getSQL();
   await sql`DELETE FROM novels WHERE id = ${id}`;
+}
+
+export async function getTotalStats() {
+  await initDB();
+  const sql = getSQL();
+  const rows = await sql`
+    SELECT
+      COUNT(*) as novel_count,
+      COALESCE(SUM(total_chapters), 0) as total_chapters,
+      COALESCE(SUM(uploaded_chapters), 0) as uploaded_chapters
+    FROM novels
+  `;
+  return rows[0];
 }

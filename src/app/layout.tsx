@@ -15,21 +15,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "DarkPaw Chronicles — Audiobook Progress Tracker",
   description:
-    "Track the progress of novel audiobooks on DarkPaw Chronicles. See how many chapters are available and how many have been uploaded to YouTube.",
-  openGraph: {
-    title: "DarkPaw Chronicles",
-    description: "Novel Audiobook Progress Tracker",
-    type: "website",
-  },
+    "Track your novel audiobook journey. See chapter progress, YouTube uploads, and more.",
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-black">{children}</body>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="min-h-screen">{children}</body>
     </html>
   );
 }
