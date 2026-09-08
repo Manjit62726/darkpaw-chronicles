@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "DarkPaw Chronicles",
     description: "Novel Audiobook Progress Tracker",
-    url: "https://darkpaw.vercel.app",
+    url: "https://darkpaw-chronicles.vercel.app",
     siteName: "DarkPaw Chronicles",
     images: [
       {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
       "https://yt3.googleusercontent.com/O9Rsx4gIWK2YeWmbRfka1Gko0Oi5BHBlUIheyEmez9wWSXA_fQOzwXZHYRRiwfk5H0yGT4GN62g=s900-c-k-c0x00ffffff-no-rj",
     ],
   },
-  metadataBase: new URL("https://darkpaw.vercel.app"),
+  metadataBase: new URL("https://darkpaw-chronicles.vercel.app"),
 };
 
 export const viewport: Viewport = {
