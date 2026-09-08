@@ -54,29 +54,26 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT NOW()
     );
   `;
+
+  // Auto-create default admin if none exists
+  const existing = await sql`SELECT id FROM admins LIMIT 1`;
+  if (existing.length === 0) {
+    const hash = await hashPassword("admin123");
+    await sql`
+      INSERT INTO admins (username, password_hash)
+      VALUES ('admin', ${hash})
+    `;
+  }
+
   _initialized = true;
 }
 
-// Simple hash using Web Crypto API (works in Edge runtime)
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password + "darkpaw_salt_2024");
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-export async function createAdmin(username: string, password: string) {
-  await initDB();
-  const sql = getSQL();
-  const hash = await hashPassword(password);
-  const rows = await sql`
-    INSERT INTO admins (username, password_hash)
-    VALUES (${username}, ${hash})
-    ON CONFLICT (username) DO UPDATE SET password_hash = ${hash}
-    RETURNING id, username
-  `;
-  return rows[0];
 }
 
 export async function verifyAdmin(username: string, password: string) {
@@ -88,6 +85,15 @@ export async function verifyAdmin(username: string, password: string) {
     WHERE username = ${username} AND password_hash = ${hash}
   `;
   return rows[0] || null;
+}
+
+export async function changeAdminPassword(userId: number, newPassword: string) {
+  await initDB();
+  const sql = getSQL();
+  const hash = await hashPassword(newPassword);
+  await sql`
+    UPDATE admins SET password_hash = ${hash} WHERE id = ${userId}
+  `;
 }
 
 export async function getNovels(): Promise<Novel[]> {

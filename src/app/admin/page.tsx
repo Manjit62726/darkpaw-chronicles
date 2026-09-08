@@ -34,6 +34,11 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwMsg, setPwMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   useEffect(() => {
     fetchNovels();
@@ -147,6 +152,31 @@ export default function AdminPage() {
     await fetch("/api/auth", { method: "DELETE" });
     router.push("/");
     router.refresh();
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwLoading(true);
+    setPwMsg(null);
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "change-password", password: currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPwMsg({ type: "err", text: data.error || "Failed" });
+      } else {
+        setPwMsg({ type: "ok", text: "Password changed successfully" });
+        setCurrentPassword("");
+        setNewPassword("");
+      }
+    } catch {
+      setPwMsg({ type: "err", text: "Something went wrong" });
+    } finally {
+      setPwLoading(false);
+    }
   }
 
   return (
@@ -432,6 +462,66 @@ export default function AdminPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* Change Password Section */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
+        <button
+          onClick={() => setShowPassword(!showPassword)}
+          className="flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-amber-400 transition-colors mb-4"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+          {showPassword ? "Hide" : "Change"} Password
+        </button>
+
+        {showPassword && (
+          <div className="glass-card rounded-2xl p-6 max-w-md">
+            <h3 className="text-lg font-bold mb-4">Change Password</h3>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              {pwMsg && (
+                <div className={`rounded-xl px-4 py-3 text-sm ${
+                  pwMsg.type === "ok"
+                    ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
+                    : "bg-red-500/10 border border-red-500/20 text-red-400"
+                }`}>
+                  {pwMsg.text}
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">Current Password</label>
+                <input
+                  type="password"
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="input-field w-full px-4 py-2.5 rounded-xl text-sm"
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">New Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={4}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="input-field w-full px-4 py-2.5 rounded-xl text-sm"
+                  placeholder="Enter new password"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={pwLoading}
+                className="btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold text-black disabled:opacity-50"
+              >
+                {pwLoading ? "Saving..." : "Update Password"}
+              </button>
+            </form>
           </div>
         )}
       </div>
