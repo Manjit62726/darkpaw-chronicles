@@ -55,9 +55,11 @@ async function initDB() {
     );
   `;
 
-  // Auto-create default admin if none exists
-  const existing = await sql`SELECT id FROM admins LIMIT 1`;
-  if (existing.length === 0) {
+  // Ensure single admin account exists
+  const check = await sql`SELECT id FROM admins WHERE username = 'admin'`;
+  if (check.length === 0) {
+    // Delete any old registration accounts, then create default admin
+    await sql`DELETE FROM admins`;
     const hash = await hashPassword("admin123");
     await sql`
       INSERT INTO admins (username, password_hash)
