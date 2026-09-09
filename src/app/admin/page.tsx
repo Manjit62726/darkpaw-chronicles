@@ -15,7 +15,6 @@ interface Novel {
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
-  updated_at: string;
 }
 
 const emptyForm = {
@@ -88,6 +87,10 @@ export default function AdminPage() {
     e.preventDefault();
     setSaving(true);
 
+    const autoStatus = form.totalChapters > 0 && form.uploadedChapters >= form.totalChapters
+      ? "completed"
+      : form.status;
+
     const body = {
       title: form.title,
       novelName: form.novelName,
@@ -97,7 +100,7 @@ export default function AdminPage() {
       notes: form.notes,
       totalChapters: form.totalChapters,
       uploadedChapters: form.uploadedChapters,
-      status: form.status,
+      status: autoStatus,
     };
 
     try {
@@ -158,18 +161,26 @@ export default function AdminPage() {
     router.refresh();
   }
 
-  function timeAgo(dateStr: string) {
-    if (!dateStr) return "";
-    const now = new Date();
-    const date = new Date(dateStr);
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    if (seconds < 60) return "just now";
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+  function handleExportCSV() {
+    const headers = ["Title", "Novel Name", "YouTube URL", "Playlist URL", "Notes", "Total Chapters", "Uploaded", "Status"];
+    const rows = novels.map((n) => [
+      n.title,
+      n.novel_name,
+      n.youtube_url,
+      n.playlist_url || "",
+      (n.notes || "").replace(/"/g, '""'),
+      String(n.total_chapters),
+      String(n.uploaded_chapters),
+      n.status,
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "novels.csv";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -183,9 +194,14 @@ export default function AdminPage() {
             <span className="text-[var(--border)]">/</span>
             <span className="text-sm font-medium">Admin</span>
           </div>
-          <button onClick={handleLogout} className="btn btn-outline text-xs px-3 py-1.5">
-            Logout
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={handleExportCSV} className="btn btn-outline text-xs px-3 py-1.5">
+              Export
+            </button>
+            <button onClick={handleLogout} className="btn btn-outline text-xs px-3 py-1.5">
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 
@@ -380,7 +396,6 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                  <span className="text-[10px] text-[var(--text-muted)]">{timeAgo(novel.updated_at)}</span>
                   <div className="flex gap-1.5">
                     <a
                       href={novel.youtube_url}

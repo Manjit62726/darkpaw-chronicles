@@ -12,32 +12,12 @@ interface Novel {
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
-  updated_at: string;
-}
-
-function timeAgo(dateStr: string) {
-  if (!dateStr) return "";
-  const now = new Date();
-  const date = new Date(dateStr);
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
 }
 
 export default function NovelCard({ novel }: { novel: Novel }) {
   return (
     <div className="card overflow-hidden">
-      <a
-        href={novel.youtube_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block relative aspect-video"
-      >
+      <a href={`/novel/${novel.id}`} className="block relative aspect-video">
         {novel.thumbnail_url ? (
           <Image
             src={novel.thumbnail_url}
@@ -57,19 +37,12 @@ export default function NovelCard({ novel }: { novel: Novel }) {
       </a>
 
       <div className="p-3 sm:p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="font-semibold text-sm leading-snug line-clamp-2">
-              {novel.title}
-            </h3>
-            <p className="text-xs text-[var(--accent)] mt-0.5">{novel.novel_name}</p>
-          </div>
-          {novel.updated_at && (
-            <span className="text-[10px] text-[var(--text-muted)] shrink-0 whitespace-nowrap">
-              {timeAgo(novel.updated_at)}
-            </span>
-          )}
-        </div>
+        <a href={`/novel/${novel.id}`} className="block">
+          <h3 className="font-semibold text-sm leading-snug line-clamp-2 hover:text-[var(--accent)] transition-colors">
+            {novel.title}
+          </h3>
+        </a>
+        <p className="text-xs text-[var(--accent)] mt-0.5">{novel.novel_name}</p>
 
         {novel.notes && (
           <p className="text-xs text-[var(--text-muted)] mt-2 line-clamp-2">{novel.notes}</p>
