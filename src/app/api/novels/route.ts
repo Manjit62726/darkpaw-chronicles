@@ -3,6 +3,11 @@ import { getNovels, addNovel } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {
+    const session = request.cookies.get("admin_session");
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const novels = await getNovels();
     return NextResponse.json(novels);
   } catch {
