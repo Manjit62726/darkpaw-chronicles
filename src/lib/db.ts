@@ -7,6 +7,7 @@ export interface Novel {
   novel_name: string;
   youtube_url: string;
   thumbnail_url: string;
+  playlist_url: string;
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
@@ -49,12 +50,16 @@ async function initDB() {
       novel_name VARCHAR(500) NOT NULL,
       youtube_url VARCHAR(1000),
       thumbnail_url VARCHAR(1000),
+      playlist_url VARCHAR(1000) DEFAULT '',
       total_chapters INT NOT NULL DEFAULT 0,
       uploaded_chapters INT NOT NULL DEFAULT 0,
       status VARCHAR(50) DEFAULT 'ongoing',
       created_at TIMESTAMP DEFAULT NOW()
     );
   `;
+
+  // Add playlist_url column if it doesn't exist (migration)
+  await sql`ALTER TABLE novels ADD COLUMN IF NOT EXISTS playlist_url VARCHAR(1000) DEFAULT ''`;
 
   // Ensure single admin account exists
   const check = await sql`SELECT id FROM admins WHERE username = 'admin'`;
@@ -114,6 +119,7 @@ export async function addNovel(
   novelName: string,
   youtubeUrl: string,
   thumbnailUrl: string,
+  playlistUrl: string,
   totalChapters: number,
   uploadedChapters: number,
   status: string
@@ -121,8 +127,8 @@ export async function addNovel(
   await initDB();
   const sql = getSQL();
   const rows = await sql`
-    INSERT INTO novels (title, novel_name, youtube_url, thumbnail_url, total_chapters, uploaded_chapters, status)
-    VALUES (${title}, ${novelName}, ${youtubeUrl}, ${thumbnailUrl}, ${totalChapters}, ${uploadedChapters}, ${status})
+    INSERT INTO novels (title, novel_name, youtube_url, thumbnail_url, playlist_url, total_chapters, uploaded_chapters, status)
+    VALUES (${title}, ${novelName}, ${youtubeUrl}, ${thumbnailUrl}, ${playlistUrl}, ${totalChapters}, ${uploadedChapters}, ${status})
     RETURNING *
   `;
   return rows[0];
@@ -134,6 +140,7 @@ export async function updateNovel(
   novelName: string,
   youtubeUrl: string,
   thumbnailUrl: string,
+  playlistUrl: string,
   totalChapters: number,
   uploadedChapters: number,
   status: string
@@ -143,8 +150,8 @@ export async function updateNovel(
   const rows = await sql`
     UPDATE novels
     SET title = ${title}, novel_name = ${novelName}, youtube_url = ${youtubeUrl},
-        thumbnail_url = ${thumbnailUrl}, total_chapters = ${totalChapters},
-        uploaded_chapters = ${uploadedChapters}, status = ${status}
+        thumbnail_url = ${thumbnailUrl}, playlist_url = ${playlistUrl},
+        total_chapters = ${totalChapters}, uploaded_chapters = ${uploadedChapters}, status = ${status}
     WHERE id = ${id}
     RETURNING *
   `;

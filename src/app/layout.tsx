@@ -13,40 +13,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DarkPaw Chronicles — Audiobook Progress Tracker",
-  description:
-    "Where fantasy comes to life through audio. Track your novel audiobook journey from reading sites to YouTube uploads.",
+  title: "DarkPaw Chronicles",
+  description: "Novel audiobook progress tracker",
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon.png", type: "image/png", sizes: "16x16" },
+    ],
   },
   openGraph: {
     title: "DarkPaw Chronicles",
-    description: "Novel Audiobook Progress Tracker",
+    description: "Novel audiobook progress tracker",
     url: "https://darkpaw-chronicles.vercel.app",
     siteName: "DarkPaw Chronicles",
-    images: [
-      {
-        url: "https://yt3.googleusercontent.com/O9Rsx4gIWK2YeWmbRfka1Gko0Oi5BHBlUIheyEmez9wWSXA_fQOzwXZHYRRiwfk5H0yGT4GN62g=s900-c-k-c0x00ffffff-no-rj",
-        width: 900,
-        height: 900,
-        alt: "DarkPaw Chronicles",
-      },
-    ],
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "DarkPaw Chronicles",
-    description: "Novel Audiobook Progress Tracker",
-    images: [
-      "https://yt3.googleusercontent.com/O9Rsx4gIWK2YeWmbRfka1Gko0Oi5BHBlUIheyEmez9wWSXA_fQOzwXZHYRRiwfk5H0yGT4GN62g=s900-c-k-c0x00ffffff-no-rj",
-    ],
   },
   metadataBase: new URL("https://darkpaw-chronicles.vercel.app"),
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0f",
+  themeColor: "#09090b",
   width: "device-width",
   initialScale: 1,
 };
@@ -54,6 +40,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+      </head>
       <body className="min-h-screen">{children}</body>
     </html>
   );

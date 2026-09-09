@@ -10,6 +10,7 @@ interface Novel {
   novel_name: string;
   youtube_url: string;
   thumbnail_url: string;
+  playlist_url: string;
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
@@ -20,6 +21,7 @@ const emptyForm = {
   novelName: "",
   youtubeUrl: "",
   thumbnailUrl: "",
+  playlistUrl: "",
   totalChapters: 0,
   uploadedChapters: 0,
   status: "ongoing",
@@ -88,6 +90,7 @@ export default function AdminPage() {
       novelName: form.novelName,
       youtubeUrl: form.youtubeUrl,
       thumbnailUrl: form.thumbnailUrl,
+      playlistUrl: form.playlistUrl,
       totalChapters: form.totalChapters,
       uploadedChapters: form.uploadedChapters,
       status: form.status,
@@ -135,6 +138,7 @@ export default function AdminPage() {
       novelName: novel.novel_name,
       youtubeUrl: novel.youtube_url,
       thumbnailUrl: novel.thumbnail_url,
+      playlistUrl: novel.playlist_url || "",
       totalChapters: novel.total_chapters,
       uploadedChapters: novel.uploaded_chapters,
       status: novel.status,
@@ -220,6 +224,19 @@ export default function AdminPage() {
                     {fetching ? "..." : "Fetch"}
                   </button>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">
+                  Playlist URL <span className="text-[var(--text-muted)]">(optional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={form.playlistUrl}
+                  onChange={(e) => setForm({ ...form, playlistUrl: e.target.value })}
+                  className="input"
+                  placeholder="https://youtube.com/playlist?list=..."
+                />
               </div>
 
               {form.thumbnailUrl && (

@@ -7,6 +7,7 @@ interface Novel {
   novel_name: string;
   youtube_url: string;
   thumbnail_url: string;
+  playlist_url: string;
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
@@ -51,17 +52,32 @@ export default function NovelCard({ novel }: { novel: Novel }) {
           status={novel.status}
         />
 
-        <a
-          href={novel.youtube_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 flex items-center justify-center gap-2 w-full py-2 text-xs font-medium rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#3f3f46] transition-colors"
-        >
-          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-          Watch
-        </a>
+        <div className="mt-3 flex gap-2">
+          {novel.playlist_url ? (
+            <a
+              href={novel.playlist_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#3f3f46] transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+              Playlist
+            </a>
+          ) : null}
+          <a
+            href={novel.youtube_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${novel.playlist_url ? "" : "flex-1"} flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#3f3f46] transition-colors`}
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Watch
+          </a>
+        </div>
       </div>
     </div>
   );
