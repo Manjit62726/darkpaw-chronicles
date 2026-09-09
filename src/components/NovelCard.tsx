@@ -70,7 +70,7 @@ export default function NovelCard({ novel }: { novel: Novel }) {
             href={novel.youtube_url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${novel.playlist_url ? "" : "flex-1"} flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#3f3f46] transition-colors`}
+            className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#3f3f46] transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
