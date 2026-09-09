@@ -11,9 +11,11 @@ interface Novel {
   youtube_url: string;
   thumbnail_url: string;
   playlist_url: string;
+  notes: string;
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
+  updated_at: string;
 }
 
 const emptyForm = {
@@ -22,6 +24,7 @@ const emptyForm = {
   youtubeUrl: "",
   thumbnailUrl: "",
   playlistUrl: "",
+  notes: "",
   totalChapters: 0,
   uploadedChapters: 0,
   status: "ongoing",
@@ -91,6 +94,7 @@ export default function AdminPage() {
       youtubeUrl: form.youtubeUrl,
       thumbnailUrl: form.thumbnailUrl,
       playlistUrl: form.playlistUrl,
+      notes: form.notes,
       totalChapters: form.totalChapters,
       uploadedChapters: form.uploadedChapters,
       status: form.status,
@@ -139,6 +143,7 @@ export default function AdminPage() {
       youtubeUrl: novel.youtube_url,
       thumbnailUrl: novel.thumbnail_url,
       playlistUrl: novel.playlist_url || "",
+      notes: novel.notes || "",
       totalChapters: novel.total_chapters,
       uploadedChapters: novel.uploaded_chapters,
       status: novel.status,
@@ -153,9 +158,22 @@ export default function AdminPage() {
     router.refresh();
   }
 
+  function timeAgo(dateStr: string) {
+    if (!dateStr) return "";
+    const now = new Date();
+    const date = new Date(dateStr);
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (seconds < 60) return "just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  }
+
   return (
     <div className="min-h-screen">
-      {/* Top bar */}
       <div className="fixed top-0 left-0 right-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -165,19 +183,13 @@ export default function AdminPage() {
             <span className="text-[var(--border)]">/</span>
             <span className="text-sm font-medium">Admin</span>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleLogout}
-              className="btn btn-outline text-xs px-3 py-1.5"
-            >
-              Logout
-            </button>
-          </div>
+          <button onClick={handleLogout} className="btn btn-outline text-xs px-3 py-1.5">
+            Logout
+          </button>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-20 pb-16">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold">Novels</h1>
@@ -195,7 +207,6 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Form */}
         {showForm && (
           <div className="card p-5 mb-6">
             <h2 className="text-sm font-semibold mb-4">
@@ -304,6 +315,19 @@ export default function AdminPage() {
                 </select>
               </div>
 
+              <div>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">
+                  Notes <span className="text-[var(--text-muted)]">(optional)</span>
+                </label>
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  className="input"
+                  rows={2}
+                  placeholder="Short description or links..."
+                />
+              </div>
+
               <div className="flex gap-2 pt-1">
                 <button type="submit" disabled={saving} className="btn btn-primary text-sm disabled:opacity-50">
                   {saving ? "Saving..." : editingId ? "Update" : "Add"}
@@ -320,7 +344,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Novel List */}
         {loading ? (
           <div className="text-center py-16">
             <div className="w-5 h-5 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin mx-auto" />
@@ -333,7 +356,7 @@ export default function AdminPage() {
           <div className="space-y-3">
             {novels.map((novel) => (
               <div key={novel.id} className="card p-4 flex items-center gap-4">
-                <div className="w-32 h-20 rounded-lg overflow-hidden bg-[var(--bg)] shrink-0">
+                <div className="w-32 h-20 rounded-lg overflow-hidden bg-[var(--bg)] shrink-0 hidden sm:block">
                   {novel.thumbnail_url ? (
                     <img src={novel.thumbnail_url} alt={novel.title} className="w-full h-full object-cover" />
                   ) : (
@@ -348,29 +371,35 @@ export default function AdminPage() {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm truncate">{novel.title}</h3>
                   <p className="text-xs text-[var(--accent)] mt-0.5">{novel.novel_name}</p>
+                  {novel.notes && (
+                    <p className="text-xs text-[var(--text-muted)] mt-1 truncate">{novel.notes}</p>
+                  )}
                   <div className="mt-2 max-w-xs">
                     <ProgressBar uploaded={novel.uploaded_chapters} total={novel.total_chapters} status={novel.status} size="sm" />
                   </div>
                 </div>
 
-                <div className="flex gap-1.5 shrink-0">
-                  <a
-                    href={novel.youtube_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-outline text-xs px-2.5 py-1.5"
-                  >
-                    Watch
-                  </a>
-                  <button onClick={() => handleEdit(novel)} className="btn btn-outline text-xs px-2.5 py-1.5">
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(novel.id)}
-                    className="btn text-xs px-2.5 py-1.5 text-red-400 border border-red-500/20 hover:bg-red-500/10"
-                  >
-                    Del
-                  </button>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <span className="text-[10px] text-[var(--text-muted)]">{timeAgo(novel.updated_at)}</span>
+                  <div className="flex gap-1.5">
+                    <a
+                      href={novel.youtube_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline text-xs px-2.5 py-1.5"
+                    >
+                      Watch
+                    </a>
+                    <button onClick={() => handleEdit(novel)} className="btn btn-outline text-xs px-2.5 py-1.5">
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(novel.id)}
+                      className="btn text-xs px-2.5 py-1.5 text-red-400 border border-red-500/20 hover:bg-red-500/10"
+                    >
+                      Del
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

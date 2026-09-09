@@ -13,7 +13,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { title, novelName, youtubeUrl, thumbnailUrl, playlistUrl, totalChapters, uploadedChapters, status } = body;
+    const { title, novelName, youtubeUrl, thumbnailUrl, playlistUrl, notes, totalChapters, uploadedChapters, status } = body;
     const novel = await updateNovel(
       parseInt(id),
       title,
@@ -21,6 +21,7 @@ export async function PUT(
       youtubeUrl,
       thumbnailUrl,
       playlistUrl || "",
+      notes || "",
       totalChapters,
       uploadedChapters,
       status

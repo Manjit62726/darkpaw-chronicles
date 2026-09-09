@@ -8,10 +8,12 @@ export interface Novel {
   youtube_url: string;
   thumbnail_url: string;
   playlist_url: string;
+  notes: string;
   total_chapters: number;
   uploaded_chapters: number;
   status: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface AdminUser {
@@ -60,6 +62,8 @@ async function initDB() {
 
   // Add playlist_url column if it doesn't exist (migration)
   await sql`ALTER TABLE novels ADD COLUMN IF NOT EXISTS playlist_url VARCHAR(1000) DEFAULT ''`;
+  await sql`ALTER TABLE novels ADD COLUMN IF NOT EXISTS notes TEXT DEFAULT ''`;
+  await sql`ALTER TABLE novels ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`;
 
   // Ensure single admin account exists
   const check = await sql`SELECT id FROM admins WHERE username = 'admin'`;
@@ -120,6 +124,7 @@ export async function addNovel(
   youtubeUrl: string,
   thumbnailUrl: string,
   playlistUrl: string,
+  notes: string,
   totalChapters: number,
   uploadedChapters: number,
   status: string
@@ -127,8 +132,8 @@ export async function addNovel(
   await initDB();
   const sql = getSQL();
   const rows = await sql`
-    INSERT INTO novels (title, novel_name, youtube_url, thumbnail_url, playlist_url, total_chapters, uploaded_chapters, status)
-    VALUES (${title}, ${novelName}, ${youtubeUrl}, ${thumbnailUrl}, ${playlistUrl}, ${totalChapters}, ${uploadedChapters}, ${status})
+    INSERT INTO novels (title, novel_name, youtube_url, thumbnail_url, playlist_url, notes, total_chapters, uploaded_chapters, status)
+    VALUES (${title}, ${novelName}, ${youtubeUrl}, ${thumbnailUrl}, ${playlistUrl}, ${notes}, ${totalChapters}, ${uploadedChapters}, ${status})
     RETURNING *
   `;
   return rows[0];
@@ -141,6 +146,7 @@ export async function updateNovel(
   youtubeUrl: string,
   thumbnailUrl: string,
   playlistUrl: string,
+  notes: string,
   totalChapters: number,
   uploadedChapters: number,
   status: string
@@ -150,8 +156,9 @@ export async function updateNovel(
   const rows = await sql`
     UPDATE novels
     SET title = ${title}, novel_name = ${novelName}, youtube_url = ${youtubeUrl},
-        thumbnail_url = ${thumbnailUrl}, playlist_url = ${playlistUrl},
-        total_chapters = ${totalChapters}, uploaded_chapters = ${uploadedChapters}, status = ${status}
+        thumbnail_url = ${thumbnailUrl}, playlist_url = ${playlistUrl}, notes = ${notes},
+        total_chapters = ${totalChapters}, uploaded_chapters = ${uploadedChapters}, status = ${status},
+        updated_at = NOW()
     WHERE id = ${id}
     RETURNING *
   `;

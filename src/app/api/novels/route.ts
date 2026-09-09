@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, novelName, youtubeUrl, thumbnailUrl, playlistUrl, totalChapters, uploadedChapters, status } = body;
-    const novel = await addNovel(title, novelName, youtubeUrl, thumbnailUrl, playlistUrl || "", totalChapters, uploadedChapters, status || "ongoing");
+    const { title, novelName, youtubeUrl, thumbnailUrl, playlistUrl, notes, totalChapters, uploadedChapters, status } = body;
+    const novel = await addNovel(title, novelName, youtubeUrl, thumbnailUrl, playlistUrl || "", notes || "", totalChapters, uploadedChapters, status || "ongoing");
     return NextResponse.json(novel, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to add novel" }, { status: 500 });
