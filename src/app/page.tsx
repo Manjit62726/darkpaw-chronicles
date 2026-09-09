@@ -1,18 +1,16 @@
 import { cookies } from "next/headers";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
 import NovelCard from "@/components/NovelCard";
-import { getNovels, getTotalStats, Novel } from "@/lib/db";
+import { getNovels, Novel } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   let novels: Novel[] = [];
-  let stats = { novel_count: 0, total_chapters: 0, uploaded_chapters: 0 };
   let admin = "";
 
   try {
-    [novels, stats] = await Promise.all([getNovels(), getTotalStats()]);
+    novels = await getNovels();
   } catch {
     // DB not configured yet
   }
@@ -31,15 +29,8 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       <Navbar admin={admin} />
-      <Hero
-        novelCount={Number(stats.novel_count) || 0}
-        totalChapters={Number(stats.total_chapters) || 0}
-        totalUploaded={Number(stats.uploaded_chapters) || 0}
-      />
 
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
-        <h2 className="text-lg font-semibold mb-4">Novels</h2>
-
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-16">
         {novels.length === 0 ? (
           <div className="text-center py-16 card">
             <p className="text-[var(--text-muted)] text-sm mb-4">No novels yet.</p>
