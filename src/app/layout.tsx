@@ -17,8 +17,7 @@ export const metadata: Metadata = {
   description:
     "Where fantasy comes to life through audio. Track your novel audiobook journey from reading sites to YouTube uploads.",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/icon.png",
+    icon: "/favicon.png",
   },
   openGraph: {
     title: "DarkPaw Chronicles",
