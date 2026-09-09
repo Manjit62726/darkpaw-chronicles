@@ -40,76 +40,59 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-amber-500/5 blur-[150px] rounded-full" />
-        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-orange-500/3 blur-[120px] rounded-full" />
-      </div>
-
-      <div className="relative w-full max-w-md">
-        <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
+      <div className="w-full max-w-sm">
+        <div className="mb-8">
+          <a href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
+            &larr; Back
           </a>
-          <h1 className="text-2xl font-bold mt-4 text-[var(--text-primary)]">Admin Login</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">Sign in to manage your novels</p>
+          <h1 className="text-xl font-bold mt-4">Admin Login</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">Sign in to manage novels</p>
         </div>
 
-        <div className="glass-card rounded-2xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-400">
-                {error}
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-                Username
-              </label>
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="input-field w-full px-4 py-3 rounded-xl text-sm"
-                placeholder="admin"
-                autoFocus
-              />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="rounded-lg px-4 py-3 text-sm bg-red-500/10 border border-red-500/20 text-red-400">
+              {error}
             </div>
+          )}
 
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-                Password
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input-field w-full px-4 py-3 rounded-xl text-sm"
-                placeholder="Enter password"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+              Username
+            </label>
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="input"
+              placeholder="admin"
+              autoFocus
+            />
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full py-3 rounded-xl text-sm font-bold text-black disabled:opacity-50"
-            >
-              {loading ? "Please wait..." : "Sign In"}
-            </button>
-          </form>
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+              Password
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input"
+              placeholder="Password"
+            />
+          </div>
 
-        <div className="text-center mt-6">
-          <a href="/" className="text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
-            &larr; Back to site
-          </a>
-        </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary w-full py-2.5 font-medium disabled:opacity-50"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
       </div>
     </div>
   );
