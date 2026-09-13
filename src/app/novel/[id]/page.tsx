@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import ProgressBar from "@/components/ProgressBar";
 import { getNovel } from "@/lib/db";
@@ -19,9 +20,9 @@ export default async function NovelPage({ params }: { params: Promise<{ id: stri
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 pt-20 pb-16">
-        <a href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors mb-6 inline-block">
+        <Link href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors mb-6 inline-block">
           &larr; Back
-        </a>
+        </Link>
 
         {/* Thumbnail */}
         {novel.thumbnail_url && (

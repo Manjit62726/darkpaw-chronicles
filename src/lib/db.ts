@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { createHash } from "crypto";
+import { initCommunityDB } from "./community-db";
 
 export interface Novel {
   id: number;
@@ -78,6 +79,8 @@ async function initDB() {
   }
 
   _initialized = true;
+
+  await initCommunityDB();
 }
 
 function hashPassword(password: string): string {

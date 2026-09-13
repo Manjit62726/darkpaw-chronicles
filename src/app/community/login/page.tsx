@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
-export default function LoginPage() {
+export default function CommunityLoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +16,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth", {
+      const res = await fetch("/api/community/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "login", username, password }),
@@ -30,7 +29,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/admin");
+      router.push("/community");
       router.refresh();
     } catch {
       setError("Something went wrong");
@@ -43,11 +42,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8">
-          <Link href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
-            &larr; Back
-          </Link>
-          <h1 className="text-xl font-bold mt-4">Admin Login</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">Sign in to manage novels</p>
+          <a href="/community" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
+            &larr; Back to Community
+          </a>
+          <h1 className="text-xl font-bold mt-4">Login</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">Sign in to vote and post</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -58,24 +57,20 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-              Username
-            </label>
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">Username</label>
             <input
               type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="input"
-              placeholder="admin"
+              placeholder="Your username"
               autoFocus
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">Password</label>
             <input
               type="password"
               required
@@ -86,13 +81,16 @@ export default function LoginPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn btn-primary w-full py-2.5 font-medium disabled:opacity-50"
-          >
-            {loading ? "Signing in..." : "Sign In"}
+          <button type="submit" disabled={loading} className="btn btn-primary w-full py-2.5 font-medium disabled:opacity-50">
+            {loading ? "Signing in..." : "Login"}
           </button>
+
+          <p className="text-xs text-center text-[var(--text-muted)]">
+            Don&apos;t have an account?{" "}
+            <a href="/community/register" className="text-[var(--accent)] hover:underline">
+              Sign up
+            </a>
+          </p>
         </form>
       </div>
     </div>

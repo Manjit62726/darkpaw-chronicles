@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import ProgressBar from "@/components/ProgressBar";
 
 interface Novel {
@@ -188,9 +189,9 @@ export default function AdminPage() {
       <div className="fixed top-0 left-0 right-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
+            <Link href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
               &larr; Home
-            </a>
+            </Link>
             <span className="text-[var(--border)]">/</span>
             <span className="text-sm font-medium">Admin</span>
           </div>
